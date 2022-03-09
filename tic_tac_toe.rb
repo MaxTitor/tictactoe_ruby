@@ -1,17 +1,23 @@
 module Inputs
-	@@input = Array.new
 	def self.get
+		puts
 		puts "you are: x"
 		print "select row: "
-		@player_row = gets.chomp
+		@row = gets.chomp
 		print "select space: "
-		@player_space = gets.chomp
-		GameBoard.input(@player_row, @player_space)
+		@space = gets.chomp
+		TicTacToe.player_input(@row, @space)
 	end
 
 	def self.cpu
 		@cpu_row = rand(1..3)
 		@cpu_space = rand(1..3)
+		while GameBoard.board[@cpu_row][@cpu_space] == "." ||
+			    GameBoard.board[@cpu_row][@cpu_space] == "x"
+			@cpu_row = rand(1..3)
+			@cpu_space = rand(1..3)
+		end
+		TicTacToe.cpu_input(@cpu_row, @cpu_space)
 	end
 end
 
@@ -21,13 +27,20 @@ class GameBoard
 	@row_3 = [".", ".", "."]
 	@board = [@row_1, @row_2, @row_3]
 
-	def self.input(row, space)
-		@player_row = row.to_i - 1
-		@player_space = space.to_i - 1
-		@board[@player_row][@player_space] = "x"
-		GameBoard.show_board
-		Inputs.get
+	def self.board
+		@board
 	end
+
+	def self.place_moves(row, space, player)
+		@board[row][space] = player.to_s
+		puts
+		GameBoard.show_board
+		if player.to_s == "x"
+			Inputs.cpu
+		else
+			Inputs.get
+		end
+	end	
 
 	def self.show_board
 		@board.each do |row|
@@ -41,6 +54,20 @@ class TicTacToe < GameBoard
 	def initialize
 		GameBoard.show_board
 		Inputs.get
+	end
+
+	def self.player_input(row, space)
+		@row = row.to_i - 1
+		@space = space.to_i - 1
+		@player = "x"
+		GameBoard.place_moves(@row, @space, @player)
+	end
+
+	def self.cpu_input(row, space)
+		@row = row.to_i - 1
+		@space = space.to_i - 1
+		@player = "o"
+		GameBoard.place_moves(@row, @space, @player)
 	end
 end
 
