@@ -10,11 +10,11 @@ module Inputs
 	end
 
 	def self.cpu
-		@cpu_row = rand(0..2)
-		@cpu_space = rand(0..2)
-		while GameBoard.board[@cpu_row][@cpu_space] == "x"
-			@cpu_row = rand(0..2)
-			@cpu_space = rand(0..2)
+		@cpu_row = rand(1..3)
+		@cpu_space = rand(1..3)
+		while GameBoard.board[@cpu_row - 1][@cpu_space - 1] == "x"
+			@cpu_row = rand(1..3)
+			@cpu_space = rand(1..3)
 		end
 		TicTacToe.cpu_input(@cpu_row, @cpu_space)
 	end
