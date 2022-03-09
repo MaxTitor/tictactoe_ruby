@@ -1,22 +1,94 @@
+# I wasn't expecting any visitors. Sorry about the mess.
+
+module GameStatus
+	def self.check
+		if GameBoard.board[0] == ["x", "x", "x"] ||
+			 GameBoard.board[1] == ["x", "x", "x"] ||
+			 GameBoard.board[2] == ["x", "x", "x"]
+				"player wins"
+		elsif GameBoard.board[0][0] == "x" &&
+					GameBoard.board[1][0] == "x" &&
+					GameBoard.board[2][0] == "x" ||
+					GameBoard.board[0][1] == "x" &&
+					GameBoard.board[1][1] == "x" &&
+					GameBoard.board[2][1] == "x" ||
+					GameBoard.board[0][2] == "x" &&
+					GameBoard.board[1][2] == "x" &&
+					GameBoard.board[2][2] == "x"
+						"player wins"
+		elsif GameBoard.board[0][0] == "x" &&
+					GameBoard.board[1][1] == "x" &&
+					GameBoard.board[2][2] == "x"
+						"player wins"
+		elsif GameBoard.board[0][2] == "x" &&
+					GameBoard.board[1][1] == "x" &&
+					GameBoard.board[2][0] == "x"
+						"player wins"
+		elsif GameBoard.board[0] == ["o", "o", "o"] ||
+				 	GameBoard.board[1] == ["o", "o", "o"] ||
+			 		GameBoard.board[2] == ["o", "o", "o"]
+						"computer wins"
+		elsif GameBoard.board[0][0] == "o" &&
+					GameBoard.board[1][0] == "o" &&
+					GameBoard.board[2][0] == "o" ||
+					GameBoard.board[0][1] == "o" &&
+					GameBoard.board[1][1] == "o" &&
+					GameBoard.board[2][1] == "o" ||
+					GameBoard.board[0][2] == "o" &&
+					GameBoard.board[1][2] == "o" &&
+					GameBoard.board[2][2] == "o"
+						"computer wins"
+		elsif GameBoard.board[0][0] == "o" &&
+					GameBoard.board[1][1] == "o" &&
+					GameBoard.board[2][2] == "o"
+						"computer wins"
+		elsif GameBoard.board[0][2] == "o" &&
+					GameBoard.board[1][1] == "o" &&
+					GameBoard.board[2][0] == "o"
+						"computer wins"
+		elsif GameBoard.board[0][0] != "." &&
+					GameBoard.board[1][0] != "." &&
+					GameBoard.board[2][0] != "." &&
+					GameBoard.board[0][1] != "." &&
+					GameBoard.board[1][1] != "." &&
+					GameBoard.board[2][1] != "." &&
+					GameBoard.board[0][2] != "." &&
+					GameBoard.board[1][2] != "." &&
+					GameBoard.board[2][2] != "."
+						"draw"
+		else
+			"continue"
+		end
+	end
+end
+
 module Inputs
 	def self.player
-		puts
 		puts "you are: x"
 		print "select row: "
 		@row = gets.chomp
 		print "select space: "
 		@space = gets.chomp
-		TicTacToe.player_input(@row, @space)
+		if GameBoard.board[@row.to_i - 1][@space.to_i - 1] == "o"
+			puts "You can't use that space, it's already taken by the computer"
+			Inputs.player
+		elsif GameBoard.board[@row.to_i - 1][@space.to_i - 1] == "x"
+			puts "You can't use that space, you've already taken it"
+			Inputs.player
+		else
+			TicTacToe.player_input(@row, @space)
+		end
 	end
 
 	def self.cpu
-		@cpu_row = rand(1..3)
-		@cpu_space = rand(1..3)
-		while GameBoard.board[@cpu_row - 1][@cpu_space - 1] == "x"
-			@cpu_row = rand(1..3)
-			@cpu_space = rand(1..3)
+		@row = rand(0..2)
+		@space = rand(0..2)
+		while GameBoard.board[@row][@space] == "x" ||
+					GameBoard.board[@row][@space] == "o"
+			@row = rand(0..2)
+			@space = rand(0..2)
 		end
-		TicTacToe.cpu_input(@cpu_row, @cpu_space)
+		TicTacToe.cpu_input(@row, @space)
 	end
 end
 
@@ -34,10 +106,21 @@ class GameBoard
 		@board[row][space] = player.to_s
 		puts
 		GameBoard.show_board
-		if player.to_s == "x"
-			Inputs.cpu
-		else
-			Inputs.player
+		if GameStatus.check == "continue"
+			if player.to_s == "x"
+				Inputs.cpu
+			else
+				Inputs.player
+			end
+		elsif GameStatus.check == "player wins"
+			puts
+			puts "Player Wins!"
+		elsif GameStatus.check == "computer wins"
+			puts
+			puts "Computer Wins!"
+		elsif GameStatus.check == "draw"
+			puts
+			puts "Draw..."
 		end
 	end	
 
@@ -50,6 +133,7 @@ end
 
 class TicTacToe < GameBoard
 	include Inputs
+	include GameStatus
 
 	def initialize
 		GameBoard.show_board
@@ -64,11 +148,11 @@ class TicTacToe < GameBoard
 	end
 
 	def self.cpu_input(row, space)
-		@row = row.to_i - 1
-		@space = space.to_i - 1
+		@row = row.to_i
+		@space = space.to_i
 		@player = "o"
 		GameBoard.place_moves(@row, @space, @player)
 	end
 end
 
-game = TicTacToe.new
+TicTacToe.new
