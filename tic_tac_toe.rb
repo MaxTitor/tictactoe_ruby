@@ -47,48 +47,50 @@ class TicTacToe
 	end
 end
 
-def shell
-	game = TicTacToe.new
-	while true do
-		#Player 1's turn
-		game.show_board
-		puts "Player one, choose your space:"
-		p1_input = gets.chomp.to_i
-		game.player_input(p1_input, "X")
+class Shell
+	@@turn = 0
+	@@player = "X"
 
-		p1_verdict = game.check_for_winner("X")
-		if p1_verdict == "congestion"
-			game.show_board
-			puts
-			puts "Oh dear, it seems we have a congestion. Neither player wins!... Lame."
-			break
-		elsif p1_verdict == "winner"
-			game.show_board
-			puts
-			puts "We have a winner!"
-			break
-		end
+	def initialize
+		game = TicTacToe.new
+		while true do
 
-		#Player 2's turn
-		game.show_board
-		puts "Player two, choose your space:"
-		p2_input = gets.chomp.to_i
-		game.player_input(p2_input, "O")
-		game.check_for_winner("O")
+			if @@turn == 0
+				@@player = "X"
+			else
+				@@player = "O"
+			end
 
-		p2_verdict = game.check_for_winner("O")
-		if p2_verdict == "congestion"
 			game.show_board
-			puts
-			puts "Oh dear, it seems we have a congestion. Neither player wins!... Lame."
-			break
-		elsif p2_verdict == "winner"
-			game.show_board
-			puts
-			puts "We have a winner!"
-			break
+
+			if @@player == "X"
+				puts "Player one, choose your space:"
+			else
+				puts "Player two, choose your space:"
+			end
+			input = gets.chomp.to_i
+			game.player_input(input, @@player)
+
+			input = game.check_for_winner(@@player)
+			if input == "congestion"
+				game.show_board
+				puts
+				puts "Oh dear, it seems we have a congestion. Neither player wins!... Lame."
+				break
+			elsif input == "winner"
+				game.show_board
+				puts
+				puts "We have a winner!"
+				break
+			end
+
+			if @@turn == 0
+				@@turn += 1
+			else
+				@@turn -= 1
+			end
 		end
 	end
 end
 
-shell
+Shell.new
