@@ -1,158 +1,94 @@
-# I wasn't expecting any visitors. Sorry about the mess.
+class TicTacToe
+	@@board = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+	@@spaces_taken = 0
 
-module GameStatus
-	def self.check
-		if GameBoard.board[0] == ["x", "x", "x"] ||
-			 GameBoard.board[1] == ["x", "x", "x"] ||
-			 GameBoard.board[2] == ["x", "x", "x"]
-				"player wins"
-		elsif GameBoard.board[0][0] == "x" &&
-					GameBoard.board[1][0] == "x" &&
-					GameBoard.board[2][0] == "x" ||
-					GameBoard.board[0][1] == "x" &&
-					GameBoard.board[1][1] == "x" &&
-					GameBoard.board[2][1] == "x" ||
-					GameBoard.board[0][2] == "x" &&
-					GameBoard.board[1][2] == "x" &&
-					GameBoard.board[2][2] == "x"
-						"player wins"
-		elsif GameBoard.board[0][0] == "x" &&
-					GameBoard.board[1][1] == "x" &&
-					GameBoard.board[2][2] == "x"
-						"player wins"
-		elsif GameBoard.board[0][2] == "x" &&
-					GameBoard.board[1][1] == "x" &&
-					GameBoard.board[2][0] == "x"
-						"player wins"
-		elsif GameBoard.board[0] == ["o", "o", "o"] ||
-				 	GameBoard.board[1] == ["o", "o", "o"] ||
-			 		GameBoard.board[2] == ["o", "o", "o"]
-						"computer wins"
-		elsif GameBoard.board[0][0] == "o" &&
-					GameBoard.board[1][0] == "o" &&
-					GameBoard.board[2][0] == "o" ||
-					GameBoard.board[0][1] == "o" &&
-					GameBoard.board[1][1] == "o" &&
-					GameBoard.board[2][1] == "o" ||
-					GameBoard.board[0][2] == "o" &&
-					GameBoard.board[1][2] == "o" &&
-					GameBoard.board[2][2] == "o"
-						"computer wins"
-		elsif GameBoard.board[0][0] == "o" &&
-					GameBoard.board[1][1] == "o" &&
-					GameBoard.board[2][2] == "o"
-						"computer wins"
-		elsif GameBoard.board[0][2] == "o" &&
-					GameBoard.board[1][1] == "o" &&
-					GameBoard.board[2][0] == "o"
-						"computer wins"
-		elsif GameBoard.board[0][0] != "." &&
-					GameBoard.board[1][0] != "." &&
-					GameBoard.board[2][0] != "." &&
-					GameBoard.board[0][1] != "." &&
-					GameBoard.board[1][1] != "." &&
-					GameBoard.board[2][1] != "." &&
-					GameBoard.board[0][2] != "." &&
-					GameBoard.board[1][2] != "." &&
-					GameBoard.board[2][2] != "."
-						"draw"
+	def show_board
+		puts " #{@@board[0]} | #{@@board[1]} | #{@@board[2]} "
+		puts "-----------"
+		puts " #{@@board[3]} | #{@@board[4]} | #{@@board[5]} "
+		puts "-----------"
+		puts " #{@@board[6]} | #{@@board[7]} | #{@@board[8]} "
+	end
+
+	def check_for_winner(player)
+		@player = player
+		@winning_patterns = [
+			[0, 1, 2],	#row 1
+			[3, 4, 5],	#row 2
+			[6, 7, 8],	#row 3
+			[0, 3, 6],	#vertical row 1
+			[1, 4, 7],	#veritcal row 2
+			[2, 5, 8],	#vertical row 3
+			[0, 4, 8],	#diagonal 1
+			[2, 4, 6]		#diagonal 2
+		]
+
+		if @@spaces_taken >= 9
+			return "congestion"
 		else
-			"continue"
-		end
-	end
-end
-
-module Inputs
-	def self.player
-		puts "you are: x"
-		print "select row: "
-		@row = gets.chomp
-		print "select space: "
-		@space = gets.chomp
-		if GameBoard.board[@row.to_i - 1][@space.to_i - 1] == "o"
-			puts "You can't use that space, it's already taken by the computer"
-			Inputs.player
-		elsif GameBoard.board[@row.to_i - 1][@space.to_i - 1] == "x"
-			puts "You can't use that space, you've already taken it"
-			Inputs.player
-		else
-			TicTacToe.player_input(@row, @space)
-		end
-	end
-
-	def self.cpu
-		@row = rand(0..2)
-		@space = rand(0..2)
-		while GameBoard.board[@row][@space] == "x" ||
-					GameBoard.board[@row][@space] == "o"
-			@row = rand(0..2)
-			@space = rand(0..2)
-		end
-		TicTacToe.cpu_input(@row, @space)
-	end
-end
-
-class GameBoard
-	@row_1 = [".", ".", "."]
-	@row_2 = [".", ".", "."]
-	@row_3 = [".", ".", "."]
-	@board = [@row_1, @row_2, @row_3]
-
-	def self.board
-		@board
-	end
-
-	def self.place_moves(row, space, player)
-		@board[row][space] = player.to_s
-		puts
-		GameBoard.show_board
-		if GameStatus.check == "continue"
-			if player.to_s == "x"
-				Inputs.cpu
-			else
-				Inputs.player
+			@winning_patterns.each do |pattern|
+				if @@board[pattern[0]] == player && @@board[pattern[1]] == player && @@board[pattern[2]] == player
+					return "winner"
+				end
 			end
-		elsif GameStatus.check == "player wins"
-			puts
-			puts "Player Wins!"
-		elsif GameStatus.check == "computer wins"
-			puts
-			puts "Computer Wins!"
-		elsif GameStatus.check == "draw"
-			puts
-			puts "Draw..."
 		end
-	end	
+	end
 
-	def self.show_board
-		@board.each do |row|
-			p row.join
+	def player_input(space, player)
+		@space = space -= 1
+		if @@board[@space] == "X" || @@board[@space] == "O"
+			puts "This space is already taken."
+		elsif @space > 8
+			puts "That is not a valid space."
+		else
+			@@board[@space] = player
+			@@spaces_taken += 1
 		end
 	end
 end
 
-class TicTacToe < GameBoard
-	include Inputs
-	include GameStatus
+def shell
+	game = TicTacToe.new
+	while true do
+		#Player 1's turn
+		game.show_board
+		puts "Player one, choose your space:"
+		p1_input = gets.chomp.to_i
+		game.player_input(p1_input, "X")
 
-	def initialize
-		GameBoard.show_board
-		Inputs.player
-	end
+		p1_verdict = game.check_for_winner("X")
+		if p1_verdict == "congestion"
+			game.show_board
+			puts
+			puts "Oh dear, it seems we have a congestion. Neither player wins!... Lame."
+			break
+		elsif p1_verdict == "winner"
+			game.show_board
+			puts
+			puts "We have a winner!"
+			break
+		end
 
-	def self.player_input(row, space)
-		@row = row.to_i - 1
-		@space = space.to_i - 1
-		@player = "x"
-		GameBoard.place_moves(@row, @space, @player)
-	end
+		#Player 2's turn
+		game.show_board
+		puts "Player two, choose your space:"
+		p2_input = gets.chomp.to_i
+		game.player_input(p2_input, "O")
+		game.check_for_winner("O")
 
-	def self.cpu_input(row, space)
-		@row = row.to_i
-		@space = space.to_i
-		@player = "o"
-		GameBoard.place_moves(@row, @space, @player)
+		p2_verdict = game.check_for_winner("O")
+		if p2_verdict == "congestion"
+			game.show_board
+			puts
+			puts "Oh dear, it seems we have a congestion. Neither player wins!... Lame."
+			break
+		elsif p2_verdict == "winner"
+			game.show_board
+			puts
+			puts "We have a winner!"
+			break
+		end
 	end
 end
 
-TicTacToe.new
+shell
